@@ -2,22 +2,34 @@
     "version": 2,
     "builds": [
         {
-            "src": "./server.js",
+            "src": "server.js",
             "use": "@vercel/node"
-        },
-        {
-            "src": "public/**/*",
-            "use": "@vercel/static"
         }
     ],
-    "routes": [
+    "rewrites": [
         {
-            "src": "/api/(.*)",
-            "dest": "/server.js"
+            "source": "/api/(.*)",
+            "destination": "/server.js"
         },
         {
-            "src": "/(.*)",
-            "dest": "/public/$1"
+            "source": "/(.*)\\.(css|js|png|jpg|jpeg|gif|ico|svg)",
+            "destination": "/public/$1.$2"
+        },
+        {
+            "source": "/login",
+            "destination": "/public/login.html"
+        },
+        {
+            "source": "/register",
+            "destination": "/public/register.html"
+        },
+        {
+            "source": "/dashboard",
+            "destination": "/public/dashboard.html"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/public/index.html"
         }
     ]
 }
