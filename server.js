@@ -85,18 +85,20 @@ app.use((req, res) => {
 // ─── Database & Server Start ─────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`🚀 FinTrack Pro server running on http://localhost:${PORT}`);
-});
-
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB connected successfully');
+    app.listen(PORT, () => {
+      console.log(`🚀 FinTrack Pro server running on http://localhost:${PORT}`);
+    });
   })
   .catch(err => {
     console.error('❌ MongoDB connection failed:', err.message);
     console.log('💡 Please update MONGO_URI in your .env file with a valid MongoDB Atlas connection string.');
-    console.log(`⚠️  Server running WITHOUT database on http://localhost:${PORT}`);
+    // Start server anyway so frontend is accessible
+    app.listen(PORT, () => {
+      console.log(`⚠️  Server running WITHOUT database on http://localhost:${PORT}`);
+    });
   });
 
 module.exports = app;
