@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard – FinTrack Pro</title>
+    <meta name="description"
+        content="Your personal financial dashboard — view your health score, charts, projections, and history.">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        .dash-layout {
+            padding-top: 5rem;
+            min-height: 100vh;
+        }
+
+        .welcome-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .welcome-bar h1 {
+            font-size: 1.5rem;
+        }
+
+        .welcome-bar .actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        /* KPI Row */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Score Section */
+        .score-section {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .score-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Charts */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 280px;
+        }
+
+        .chart-container canvas {
+            max-height: 280px;
+        }
+
+        /* Form */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .form-section {
+            margin-bottom: 1.75rem;
+        }
+
+        .form-section-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--emerald);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Tips */
+        .tips-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .tip-item {
+            padding: 0.65rem 1rem;
+            background: rgba(16, 185, 129, 0.05);
+            border-left: 3px solid var(--emerald);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Comparison */
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .compare-vs {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-muted);
+        }
+
+        .compare-item {
+            text-align: center;
+        }
+
+        .compare-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .compare-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .compare-delta {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+
+        /* Print */
+        @media print {
+
+            .navbar,
+            .hamburger,
+            .welcome-bar .actions,
+            #financeForm,
+            .history-section,
+            .btn,
+            .no-print {
+                display: none !important;
+            }
+
+            body {
+                background: white;
+                color: #333;
+            }
+
+            .card {
+                border: 1px solid #ddd;
+                background: #fafafa;
+            }
+
+            .stat-value,
+            .score-ring .score-number,
+            h1,
+            h2,
+            h3 {
+                color: #111 !important;
+                -webkit-text-fill-color: #111 !important;
+            }
+
+            .stat-label,
+            .form-label,
+            p {
+                color: #555 !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .score-section {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .compare-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .compare-vs {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <div class="logo-icon">💰</div>
+            <div>
+                <div class="logo-text">FinTrack Pro</div>
+                <div class="logo-sub">Dashboard</div>
+            </div>
+        </a>
+        <button class="hamburger" onclick="document.querySelector('.nav-links').classList.toggle('open')">
+            <span></span><span></span><span></span>
+        </button>
+        <ul class="nav-links">
+            <li>
+                <select class="lang-select" id="currencySelect"
+                    onchange="window.changeCurrency && window.changeCurrency(this.value)">
+                    <option value="PKR">🇵🇰 PKR</option>
+                    <option value="USD">🇺🇸 USD</option>
+                    <option value="EUR">🇪🇺 EUR</option>
+                    <option value="GBP">🇬🇧 GBP</option>
+                </select>
+            </li>
+            <li>
+                <select class="lang-select" id="langSelect">
+                    <option value="en">🇬🇧 English</option>
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="fr">🇫🇷 Français</option>
+                    <option value="ar">🇸🇦 العربية</option>
+                    <option value="ur">🇵🇰 اردو</option>
+                </select>
+            </li>
+            <li><button onclick="window.toggleTheme && window.toggleTheme()" class="btn btn-secondary btn-sm"
+                    id="themeToggle" style="padding:0.4rem 0.6rem; border-radius:50%;"><i
+                        class="fas fa-moon"></i></button></li>
+            <li><a href="/" class="btn btn-secondary btn-sm"><i class="fas fa-home"></i> Home</a></li>
+        </ul>
+    </nav>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Dashboard Content -->
+    <div class="dash-layout">
+        <div class="container">
+            <!-- Welcome Bar -->
+            <div class="welcome-bar reveal">
+                <div>
+                    <h1>Welcome to <span class="gradient-text">FinTrack Pro</span> 👋</h1>
+                    <p style="color:var(--text-muted); font-size:0.85rem;">Your financial health overview</p>
+                </div>
+                <div class="actions no-print">
+                    <button class="btn btn-secondary btn-sm" onclick="window.print()"><i class="fas fa-file-pdf"></i>
+                        Download PDF</button>
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="kpi-grid reveal">
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-label">Financial Score</div>
+                    <div class="stat-value" id="kpiScore" style="color:var(--emerald)">--</div>
+                    <div class="stat-change" id="kpiScoreChange"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-label">Savings Rate</div>
+                    <div class="stat-value" id="kpiSavings" style="color:var(--cyan)">--%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💵</div>
+                    <div class="stat-label">Monthly Balance</div>
+                    <div class="stat-value" id="kpiBalance" style="color:var(--emerald)">$--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🛡️</div>
+                    <div class="stat-label">Risk Level</div>
+                    <div id="kpiRisk"><span class="badge badge-stable">--</span></div>
+                </div>
+            </div>
+
+            <!-- Score Meter + Tips -->
+            <div class="score-section reveal">
+                <div class="card score-card">
+                    <div class="score-meter-wrapper">
+                        <div class="score-ring">
+                            <svg width="180" height="180" viewBox="0 0 180 180">
+                                <circle class="track" cx="90" cy="90" r="70" />
+                                <circle class="progress" id="scoreProgress" cx="90" cy="90" r="70" />
+                            </svg>
+                            <div class="center-text">
+                                <div class="score-number" id="scoreValue">0</div>
+                                <div class="score-label-sm">Health Score</div>
+                            </div>
+                        </div>
+                        <div id="scoreRiskBadge"><span class="badge badge-stable">Calculating...</span></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3 style="margin-bottom:1rem;"><i class="fas fa-lightbulb" style="color:var(--yellow)"></i>
+                        Financial Tips</h3>
+                    <div class="tips-list" id="tipsList">
+                        <div class="tip-item">Enter your financial data below to get personalized tips.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gamification Badges -->
+            <div class="card reveal" style="margin-bottom:2rem; background:var(--glass-bg);">
+                <h3 style="margin-bottom:1rem;"><i class="fas fa-medal" style="color:var(--yellow)"></i> Achievements
+                </h3>
+                <div class="badges-grid" id="badgesContainer"
+                    style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1rem;">
+                    <div class="gamification-badge locked" id="badgeSaver">
+                        <div class="badge-icon"><i class="fas fa-piggy-bank"></i></div>
+                        <div class="badge-info">
+                            <h4>Savings Master</h4>
+                            <p>Save over 20% of your income</p>
+                        </div>
+                    </div>
+                    <div class="gamification-badge locked" id="badgeSafe">
+                        <div class="badge-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div class="badge-info">
+                            <h4>Security Shield</h4>
+                            <p>Maintain an Excellent Health Score for 1+ months</p>
+                        </div>
+                    </div>
+                    <div class="gamification-badge locked" id="badgeGrowth">
+                        <div class="badge-icon"><i class="fas fa-arrow-trend-up"></i></div>
+                        <div class="badge-info">
+                            <h4>Growth Mindset</h4>
+                            <p>Log your finances for 3 consecutive months</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Input Form -->
+            <div class="card reveal no-print" style="margin-bottom:2rem;">
+                <h3 style="margin-bottom:1.5rem;"><i class="fas fa-calculator" style="color:var(--emerald)"></i> Enter
+                    Financial Data</h3>
+
+                <form id="financeForm">
+                    <div class="form-section">
+                        <div class="form-section-title"><i class="fas fa-calendar"></i> Period</div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Month</label>
+                                <select id="month" class="form-control" required>
+                                    <option value="1">January</option>
+                                    <option value="2">February</option>
+                                    <option value="3">March</option>
+                                    <option value="4">April</option>
+                                    <option value="5">May</option>
+                                    <option value="6">June</option>
+                                    <option value="7">July</option>
+                                    <option value="8">August</option>
+                                    <option value="9">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11">November</option>
+                                    <option value="12">December</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Year</label>
+                                <input type="number" id="year" class="form-control" value="2026" min="2020" max="2100"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Monthly Income ($)</label>
+                                <input type="number" id="income" class="form-control" placeholder="5000" min="0"
+                                    step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Emergency Fund ($)</label>
+                                <input type="number" id="emergencyFund" class="form-control" placeholder="10000" min="0"
+                                    step="0.01">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-section-title"><i class="fas fa-receipt"></i> Monthly Expenses</div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">🏠 Housing</label>
+                                <input type="number" class="form-control expense-input" data-key="housing"
+                                    placeholder="1200" min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">🍽️ Food</label>
+                                <input type="number" class="form-control expense-input" data-key="food"
+                                    placeholder="400" min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">🚗 Transport</label>
+                                <input type="number" class="form-control expense-input" data-key="transport"
+                                    placeholder="300" min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">⚡ Utilities</label>
+                                <input type="number" class="form-control expense-input" data-key="utilities"
+                                    placeholder="150" min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">🏥 Healthcare</label>
+                                <input type="number" class="form-control expense-input" data-key="healthcare"
+                                    placeholder="100" min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">🎬 Entertainment</label>
+                                <input type="number" class="form-control expense-input" data-key="entertainment"
+                                    placeholder="200" min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">📚 Education</label>
+                                <input type="number" class="form-control expense-input" data-key="education"
+                                    placeholder="100" min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">📦 Other</label>
+                                <input type="number" class="form-control expense-input" data-key="other"
+                                    placeholder="150" min="0" step="0.01">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg" id="analyzeBtn" style="min-width:220px;">
+                        <i class="fas fa-chart-line"></i> Analyze My Finances
+                    </button>
+                </form>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid reveal" id="chartsSection" style="display:none;">
+                <div class="card">
+                    <h3 style="margin-bottom:1rem;"><i class="fas fa-chart-pie" style="color:var(--cyan)"></i> Expense
+                        Breakdown</h3>
+                    <div class="chart-container"><canvas id="expenseChart"></canvas></div>
+                </div>
+                <div class="card">
+                    <h3 style="margin-bottom:1rem;"><i class="fas fa-chart-bar" style="color:var(--emerald)"></i> Income
+                        vs Expenses</h3>
+                    <div class="chart-container"><canvas id="incomeChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Projection -->
+            <div class="card reveal" id="projectionSection" style="display:none; margin-bottom:2rem;">
+                <h3 style="margin-bottom:1rem;"><i class="fas fa-chart-line" style="color:var(--yellow)"></i> 6-Month
+                    Savings Projection</h3>
+                <div class="chart-container"><canvas id="projectionChart"></canvas></div>
+            </div>
+
+            <!-- Month Comparison -->
+            <div class="card reveal" id="comparisonSection" style="display:none; margin-bottom:2rem;">
+                <h3 style="margin-bottom:1.5rem;"><i class="fas fa-exchange-alt" style="color:var(--cyan)"></i>
+                    Month-over-Month Comparison</h3>
+                <div class="compare-grid" id="compareContent"></div>
+            </div>
+
+            <!-- History Table -->
+            <div class="card reveal history-section" style="margin-bottom:3rem;">
+                <h3 style="margin-bottom:1rem;"><i class="fas fa-history" style="color:var(--text-muted)"></i> Financial
+                    History</h3>
+                <div class="table-wrapper">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Income</th>
+                                <th>Expenses</th>
+                                <th>Balance</th>
+                                <th>Score</th>
+                                <th>Risk</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody">
+                            <tr>
+                                <td colspan="7" style="text-align:center; color:var(--text-muted); padding:2rem;">No
+                                    financial records yet. Submit data above to get started.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div> <!-- container -->
+    </div>
+
+    <script src="/js/calculator.js"></script>
+    <script src="/js/dashboard.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/translate.js"></script>
+</body>
+
+</html>

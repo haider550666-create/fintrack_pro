@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinTrack Pro – Financial Health Analyzer</title>
+  <meta name="description"
+    content="Analyze, track, and improve your financial health with FinTrack Pro. Smart budgeting, risk detection, and savings projections.">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    /* ─── Hero ───────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 5rem;
+    }
+
+    .hero-content {
+      max-width: 640px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .hero-tagline {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--emerald);
+      margin-bottom: 1.5rem;
+      font-weight: 500;
+    }
+
+    .hero h1 {
+      margin-bottom: 1.25rem;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 2.5rem;
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--glass-border);
+    }
+
+    .hero-stat-num {
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .hero-stat-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* Hero Visual */
+    .hero-visual {
+      position: relative;
+    }
+
+    .hero-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      backdrop-filter: blur(30px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      transition: transform 0.1s ease-out, box-shadow 0.3s ease;
+      position: relative;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+      /* default floating if no mouse */
+      animation: float 5s ease-in-out infinite;
+    }
+
+    .hero-card.tilt-active {
+      animation: none;
+      /* Disable float when hovering/tilting */
+    }
+
+    .hero-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-card-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .hero-card-badge {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .hero-card-badge .live-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--emerald);
+      border-radius: 50%;
+      animation: pulse-glow 2s infinite;
+    }
+
+    .dashboard-critical-pulse {
+      animation: pulse-red-text 1.5s infinite alternate;
+    }
+
+    @keyframes pulse-red-text {
+      0% {
+        text-shadow: 0 0 5px rgba(239, 68, 68, 0);
+      }
+
+      100% {
+        text-shadow: 0 0 15px rgba(239, 68, 68, 0.8);
+      }
+    }
+
+    .dashboard-emerald-pulse {
+      animation: pulse-green-text 1.5s infinite alternate;
+    }
+
+    @keyframes pulse-green-text {
+      0% {
+        text-shadow: 0 0 5px rgba(16, 185, 129, 0);
+      }
+
+      100% {
+        text-shadow: 0 0 15px rgba(16, 185, 129, 0.8);
+      }
+    }
+
+    .hero-mini-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      height: 80px;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-bar {
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+      transition: height 1s ease;
+    }
+
+    .hero-meter-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero-meter-bar {
+      flex: 1;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .hero-meter-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 2s ease;
+    }
+
+    .hero-meter-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      min-width: 70px;
+    }
+
+    .hero-meter-val {
+      font-size: 0.78rem;
+      font-weight: 600;
+      min-width: 40px;
+      text-align: right;
+    }
+
+    .floating-badge {
+      position: absolute;
+      padding: 0.6rem 1rem;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      backdrop-filter: blur(12px);
+      font-size: 0.8rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      animation: float 4s ease-in-out infinite;
+    }
+
+    .floating-badge-1 {
+      top: -15px;
+      right: -20px;
+      animation-delay: 0.5s;
+    }
+
+    .floating-badge-2 {
+      bottom: -10px;
+      left: -20px;
+      animation-delay: 1.5s;
+    }
+
+    /* ─── Features ───────────────────────── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .feature-card {
+      text-align: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin: 0 auto 1.25rem;
+    }
+
+    .feature-icon.green {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--emerald);
+    }
+
+    .feature-icon.cyan {
+      background: rgba(6, 182, 212, 0.1);
+      color: var(--cyan);
+    }
+
+    .feature-icon.orange {
+      background: rgba(249, 115, 22, 0.1);
+      color: var(--orange);
+    }
+
+    .feature-icon.yellow {
+      background: rgba(234, 179, 8, 0.1);
+      color: var(--yellow);
+    }
+
+    .feature-icon.red {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--red);
+    }
+
+    .feature-icon.blue {
+      background: rgba(99, 102, 241, 0.1);
+      color: #818CF8;
+    }
+
+    .feature-card h3 {
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-card p {
+      font-size: 0.875rem;
+    }
+
+    /* ─── CTA ────────────────────────────── */
+    .cta-section {
+      text-align: center;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: 4rem 2rem;
+    }
+
+    .cta-section h2 {
+      margin-bottom: 1rem;
+    }
+
+    .cta-section p {
+      margin-bottom: 2rem;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ─── Footer ─────────────────────────── */
+    .footer {
+      text-align: center;
+      padding: 2rem 0;
+      border-top: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    /* ─── Video Demo Modal ────────────────── */
+    .video-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+
+    .video-modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .video-modal {
+      position: relative;
+      width: 90%;
+      max-width: 900px;
+      background: var(--navy-800);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6), 0 0 60px rgba(16, 185, 129, 0.15);
+      transform: scale(0.9) translateY(30px);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .video-modal-overlay.active .video-modal {
+      transform: scale(1) translateY(0);
+    }
+
+    .video-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .video-modal-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .video-modal-title .live-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--emerald);
+      border-radius: 50%;
+      animation: pulse-glow 2s infinite;
+    }
+
+    .video-modal-close {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      color: var(--text-secondary);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .video-modal-close:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--red);
+      border-color: var(--red);
+    }
+
+    .video-modal-body {
+      padding: 0;
+      position: relative;
+    }
+
+    .video-modal-body img {
+      width: 100%;
+      display: block;
+      border-bottom-left-radius: var(--radius-xl);
+      border-bottom-right-radius: var(--radius-xl);
+    }
+
+    /* Demo Play Button (on hero) */
+    .btn-demo {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-demo .play-ring {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      font-size: 0.7rem;
+    }
+
+    .btn-demo:hover .play-ring {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    @media (max-width: 768px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-visual {
+        order: -1;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-stats {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .video-modal {
+        width: 95%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-gradient-wave"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div id="particles-container"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <div class="logo-icon">💰</div>
+      <div>
+        <div class="logo-text">FinTrack Pro</div>
+        <div class="logo-sub">Financial Health Analyzer</div>
+      </div>
+    </a>
+    <button class="hamburger" onclick="document.querySelector('.nav-links').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li>
+        <select class="lang-select" id="currencySelect"
+          onchange="window.changeCurrency && window.changeCurrency(this.value)">
+          <option value="PKR">🇵🇰 PKR</option>
+          <option value="USD">🇺🇸 USD</option>
+          <option value="EUR">🇪🇺 EUR</option>
+          <option value="GBP">🇬🇧 GBP</option>
+        </select>
+      </li>
+      <li>
+        <select class="lang-select" id="langSelect">
+          <option value="en">🇬🇧 English</option>
+          <option value="es">🇪🇸 Español</option>
+          <option value="fr">🇫🇷 Français</option>
+          <option value="ar">🇸🇦 العربية</option>
+          <option value="ur">🇵🇰 اردو</option>
+        </select>
+      </li>
+      <li><button onclick="window.toggleTheme && window.toggleTheme()" class="btn btn-secondary btn-sm" id="themeToggle"
+          style="padding:0.4rem 0.6rem; border-radius:50%;"><i class="fas fa-moon"></i></button></li>
+      <li><a href="/dashboard" class="btn btn-primary btn-sm">Go to Dashboard</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero section">
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-content animate-fadeInUp">
+          <div class="hero-tagline"><i class="fas fa-bolt"></i> Smart Financial Analysis</div>
+          <h1>Understand Your Money. <span class="gradient-text">Control Your Future.</span></h1>
+          <p>Analyze, track, and improve your financial health in seconds. Get instant insights, risk detection, and
+            savings projections — powered by smart math, not AI hype.</p>
+          <div class="hero-actions">
+            <a href="/dashboard" class="btn btn-primary btn-lg"><i class="fas fa-rocket"></i> Go to Dashboard</a>
+            <button onclick="openLiveDemo()" class="btn btn-outline btn-lg"><i class="fas fa-magic"></i> Try Live
+              Demo</button>
+          </div>
+          <div class="hero-stats">
+            <div>
+              <div class="hero-stat-num gradient-text" data-count="10000">0</div>
+              <div class="hero-stat-label">Users Empowered</div>
+            </div>
+            <div>
+              <div class="hero-stat-num gradient-text" data-count="85">0</div>
+              <div class="hero-stat-label">Avg Score Improvement %</div>
+            </div>
+            <div>
+              <div class="hero-stat-num gradient-text" data-count="5">0</div>
+              <div class="hero-stat-label">Languages Supported</div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-visual animate-fadeInUp" style="animation-delay:0.3s">
+          <div class="hero-card" id="heroDashboardCard">
+            <div class="hero-card-header">
+              <span class="hero-card-title">Financial Overview</span>
+              <span class="hero-card-badge"><span class="live-dot"></span> Live Updating</span>
+            </div>
+            <div class="hero-mini-chart" id="heroMiniChart">
+              <div class="hero-bar" style="height:40%;background:var(--emerald)"></div>
+              <div class="hero-bar" style="height:65%;background:var(--cyan)"></div>
+              <div class="hero-bar" style="height:45%;background:var(--emerald)"></div>
+              <div class="hero-bar" style="height:80%;background:var(--cyan)"></div>
+              <div class="hero-bar" style="height:55%;background:var(--emerald)"></div>
+              <div class="hero-bar" style="height:90%;background:var(--gradient-primary)"></div>
+            </div>
+            <div class="hero-meter-row">
+              <span class="hero-meter-label">Savings</span>
+              <div class="hero-meter-bar">
+                <div class="hero-meter-fill" id="heroSavingsFill" style="width:72%;background:var(--emerald)"></div>
+              </div>
+              <span class="hero-meter-val" id="heroSavingsVal" style="color:var(--emerald)">72%</span>
+            </div>
+            <div class="hero-meter-row">
+              <span class="hero-meter-label">Health</span>
+              <div class="hero-meter-bar">
+                <div class="hero-meter-fill" id="heroHealthFill" style="width:85%;background:var(--cyan)"></div>
+              </div>
+              <span class="hero-meter-val" id="heroHealthVal" style="color:var(--cyan)">85</span>
+            </div>
+            <div class="hero-meter-row">
+              <span class="hero-meter-label">Risk</span>
+              <div class="hero-meter-bar">
+                <div class="hero-meter-fill" id="heroRiskFill" style="width:20%;background:var(--emerald)"></div>
+              </div>
+              <span class="hero-meter-val" id="heroRiskVal" style="color:var(--emerald)">Low</span>
+            </div>
+          </div>
+          <div class="floating-badge floating-badge-1"><i class="fas fa-shield-halved" style="color:var(--emerald)"></i>
+            256-bit Encrypted</div>
+          <div class="floating-badge floating-badge-2"><i class="fas fa-chart-line" style="color:var(--cyan)"></i> +24%
+            Savings</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="section">
+    <div class="container">
+      <h2 class="section-title reveal">Everything You Need for <span class="gradient-text">Financial Clarity</span></h2>
+      <p class="section-subtitle reveal">Powerful tools designed for students, professionals, teachers, families, and
+        everyone in between.</p>
+      <div class="features-grid">
+        <div class="card feature-card reveal reveal-delay-1">
+          <div class="feature-icon green"><i class="fas fa-heartbeat"></i></div>
+          <h3>Health Score</h3>
+          <p>Get a 0–100 financial health score based on savings rate, emergency fund, and expense ratio.</p>
+        </div>
+        <div class="card feature-card reveal reveal-delay-2">
+          <div class="feature-icon cyan"><i class="fas fa-chart-pie"></i></div>
+          <h3>Expense Breakdown</h3>
+          <p>Visual pie chart showing exactly where your money goes across 8 spending categories.</p>
+        </div>
+        <div class="card feature-card reveal reveal-delay-3">
+          <div class="feature-icon orange"><i class="fas fa-shield-halved"></i></div>
+          <h3>Risk Detection</h3>
+          <p>Automatic risk level classification: Excellent, Stable, Risky, or Critical, with actionable tips.</p>
+        </div>
+        <div class="card feature-card reveal reveal-delay-1">
+          <div class="feature-icon yellow"><i class="fas fa-chart-line"></i></div>
+          <h3>6-Month Projections</h3>
+          <p>See your savings trajectory over the next 6 months with compound growth modeling.</p>
+        </div>
+        <div class="card feature-card reveal reveal-delay-2">
+          <div class="feature-icon blue"><i class="fas fa-language"></i></div>
+          <h3>Multi-Language</h3>
+          <p>Full interface translation via Google Translate — English, Spanish, French, Arabic, Urdu.</p>
+        </div>
+        <div class="card feature-card reveal reveal-delay-3">
+          <div class="feature-icon red"><i class="fas fa-file-pdf"></i></div>
+          <h3>PDF Reports</h3>
+          <p>Download professional financial summary reports to share with advisors or keep for records.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Financial Personality -->
+  <section id="personality" class="section bg-light" style="background:var(--glass-bg);">
+    <div class="container">
+      <h2 class="section-title reveal">Discover Your <span class="gradient-text">Financial Personality</span></h2>
+      <p class="section-subtitle reveal">Are you a saver, a spender, or a grower? Our analysis helps you understand your
+        natural money habits.</p>
+      <div class="features-grid">
+        <div class="card feature-card reveal reveal-delay-1">
+          <div class="feature-icon green"><i class="fas fa-piggy-bank"></i></div>
+          <h3>The Fortress Saver</h3>
+          <p>Prioritizes security. You keep expenses extremely low and build a massive emergency fund. We'll help you
+            start investing.</p>
+        </div>
+        <div class="card feature-card reveal reveal-delay-2">
+          <div class="feature-icon cyan"><i class="fas fa-seedling"></i></div>
+          <h3>The Strategic Grower</h3>
+          <p>Balances living well with aggressive investing. You optimize every dollar. We'll give you the advanced
+            metrics you crave.</p>
+        </div>
+        <div class="card feature-card reveal reveal-delay-3">
+          <div class="feature-icon orange"><i class="fas fa-shopping-bag"></i></div>
+          <h3>The Lifestyle Spender</h3>
+          <p>Focuses on experiences now. High expense ratio but good income. We'll help you automate savings without
+            killing the fun.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison -->
+  <section id="compare" class="section">
+    <div class="container">
+      <h2 class="section-title reveal">Why We're <span class="gradient-text">Different</span></h2>
+      <p class="section-subtitle reveal">See how FinTrack Pro stacks up against generic budgeting apps.</p>
+
+      <div class="table-wrapper reveal"
+        style="max-width:800px; margin: 0 auto; background:var(--glass-bg); padding:2rem; border-radius:var(--radius-lg); border:1px solid var(--glass-border);">
+        <table class="table" style="width:100%;">
+          <thead>
+            <tr>
+              <th style="font-size:1.1rem; color:var(--text-primary);">Feature</th>
+              <th style="font-size:1.1rem; color:var(--emerald); text-align:center;">FinTrack Pro</th>
+              <th style="font-size:1.1rem; color:var(--text-muted); text-align:center;">Others</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Math-Based Risk Analysis</strong></td>
+              <td style="text-align:center; color:var(--emerald);"><i class="fas fa-check-circle"></i></td>
+              <td style="text-align:center; color:var(--text-muted);"><i class="fas fa-times"></i></td>
+            </tr>
+            <tr>
+              <td><strong>Financial Health Scoring</strong></td>
+              <td style="text-align:center; color:var(--emerald);"><i class="fas fa-check-circle"></i></td>
+              <td style="text-align:center; color:var(--text-muted);">Basic Only</td>
+            </tr>
+            <tr>
+              <td><strong>Multi-Currency with Live Demo</strong></td>
+              <td style="text-align:center; color:var(--emerald);"><i class="fas fa-check-circle"></i></td>
+              <td style="text-align:center; color:var(--text-muted);"><i class="fas fa-times"></i></td>
+            </tr>
+            <tr>
+              <td><strong>Dark/Light Premium UI</strong></td>
+              <td style="text-align:center; color:var(--emerald);"><i class="fas fa-check-circle"></i></td>
+              <td style="text-align:center; color:var(--text-muted);">Sometimes</td>
+            </tr>
+            <tr>
+              <td><strong>Gamified Badges</strong></td>
+              <td style="text-align:center; color:var(--emerald);"><i class="fas fa-check-circle"></i></td>
+              <td style="text-align:center; color:var(--text-muted);"><i class="fas fa-times"></i></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section id="testimonials" class="section" style="background:var(--glass-bg);">
+    <div class="container">
+      <h2 class="section-title reveal">Trusted by <span class="gradient-text">Thousands</span></h2>
+      <p class="section-subtitle reveal">Real stories from people who took control of their financial future.</p>
+
+      <div class="testimonials-carousel reveal"
+        style="display:flex; gap:2rem; overflow-x:auto; padding-bottom:1rem; scroll-snap-type: x mandatory;">
+        <div class="card" style="min-width:300px; flex:1; scroll-snap-align: center;">
+          <div style="color:var(--yellow); margin-bottom:1rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+              class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+          <p style="font-style:italic; margin-bottom:1.5rem;">"The interactive dashboard makes it so easy to see where
+            my money goes. The health score gamifies saving for me!"</p>
+          <div style="display:flex; align-items:center; gap:1rem;">
+            <div
+              style="width:40px; height:40px; border-radius:50%; background:var(--gradient-primary); display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">
+              S</div>
+            <div>
+              <div style="font-weight:bold; color:var(--text-primary);">Sarah Jenkins</div>
+              <div style="font-size:0.8rem; color:var(--text-muted);">Small Business Owner</div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="min-width:300px; flex:1; scroll-snap-align: center;">
+          <div style="color:var(--yellow); margin-bottom:1rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+              class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+          <p style="font-style:italic; margin-bottom:1.5rem;">"Switching currencies instantly helps me manage my
+            freelance income from different countries. Brilliant execution."</p>
+          <div style="display:flex; align-items:center; gap:1rem;">
+            <div
+              style="width:40px; height:40px; border-radius:50%; background:var(--emerald); display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">
+              M</div>
+            <div>
+              <div style="font-weight:bold; color:var(--text-primary);">Michael O.</div>
+              <div style="font-size:0.8rem; color:var(--text-muted);">Freelance Developer</div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="min-width:300px; flex:1; scroll-snap-align: center;">
+          <div style="color:var(--yellow); margin-bottom:1rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+              class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
+          <p style="font-style:italic; margin-bottom:1.5rem;">"The 'Try Live Demo' sequence sold me immediately. It's
+            fast, responsive, and the dark mode looks incredible."</p>
+          <div style="display:flex; align-items:center; gap:1rem;">
+            <div
+              style="width:40px; height:40px; border-radius:50%; background:var(--cyan); display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">
+              A</div>
+            <div>
+              <div style="font-weight:bold; color:var(--text-primary);">Ali R.</div>
+              <div style="font-size:0.8rem; color:var(--text-muted);">Student</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section section-sm">
+    <div class="container">
+      <div class="cta-section reveal">
+        <h2>Ready to Take Control of Your <span class="gradient-text">Finances?</span></h2>
+        <p>Analyze your financial health score and gain immediate insights without the hassle of making an account.</p>
+        <a href="/dashboard" class="btn btn-primary btn-lg"><i class="fas fa-rocket"></i> Go to Dashboard</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Try Live Demo Modal -->
+  <div class="video-modal-overlay" id="liveDemoModal">
+    <div class="video-modal" style="max-width: 600px; padding: 0;">
+      <div class="video-modal-header">
+        <div class="video-modal-title">
+          <div class="live-dot" style="background:var(--cyan)"></div> Live Interactive Demo
+        </div>
+        <button class="video-modal-close" onclick="closeLiveDemo()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="video-modal-body" style="padding: 2rem;">
+        <div id="liveDemoContainer">
+          <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Watch how FinTrack Pro analyzes financial data in
+            real-time.</p>
+
+          <div class="form-group">
+            <label class="form-label">Monthly Income</label>
+            <input type="text" class="form-control" id="demoIncome" placeholder="Waiting..." readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Total Expenses</label>
+            <input type="text" class="form-control" id="demoExpenses" placeholder="Waiting..." readonly>
+          </div>
+
+          <div id="demoSteps" style="margin-top:2rem; display:flex; flex-direction:column; gap:1rem;">
+            <!-- Injected steps via JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>© 2024 FinTrack Pro. Built with 💚 for financial empowerment.</p>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+  <script src="/js/translate.js"></script>
+</body>
+
+</html>
